@@ -1,0 +1,10 @@
+.git
+.github
+
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+.env
+
+vendor/
