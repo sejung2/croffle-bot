@@ -1,8 +1,8 @@
 name: 질문 사항 추가
 description: 질문할 사항이 있을 때 질문을 추가합니다
 title: "[QUESTION] "
-labels: "질문"
-type: "issue"
+labels: "question"
+type: question
 body:
   - type: markdown
     attributes:
