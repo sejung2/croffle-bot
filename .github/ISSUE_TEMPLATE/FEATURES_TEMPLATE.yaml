@@ -2,7 +2,7 @@ name: ✨Features Template
 description: Template for feature requests
 title: "[FEATURE REQUEST] "
 labels: enhancement
-types: feature
+type: feature
 body:
   - type: textarea
     id: feature_background
