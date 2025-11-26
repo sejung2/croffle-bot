@@ -2,9 +2,9 @@
 
 - Please provide a brief description of the changes made in this pull request.
 
-## Related Issue
+## Related Feature ID
 
-&lt;type&gt; &#x23;&lt;issue-number&gt;
+Resolves TEMPLATE-1
 
 - Please link the related issue number here.
 
