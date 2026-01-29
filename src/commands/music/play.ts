@@ -5,7 +5,7 @@ import type { Message } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
 	description: 'Plays music in your current voice channel',
-	aliases: ['p', 'play'] // Adding an alias commands for the play command
+	aliases: ['p'] // Adding an alias commands for the play command
 })
 export class UserCommand extends Command {
 	public override async messageRun(message: Message, args: Args) {
@@ -15,19 +15,22 @@ export class UserCommand extends Command {
 			return message.reply('This command can only be used in a server.');
 		}
 
+		if (!message.channel.isSendable()) {
+			return;
+		}
+
 		const voiceChannel = member?.voice.channel;
 		if (!voiceChannel) {
 			return message.reply('You need to be in a voice channel to use this command.');
 		}
 
-		if (!message.channel.isSendable()) {
-			return;
-		}
-
+		// URL parsing and search query handling
 		const query = await args.rest('string').catch(() => null);
 
 		if (!query) {
-			return message.reply('You need to input URL to play music.\nex: `!play <YouTube URL>`');
+			return message.reply(
+				'You need to provide a search term or URL to play music.\nExamples:\n`!play never gonna give you up`\n`!play <YouTube URL>`'
+			);
 		}
 
 		const player = useMainPlayer();
