@@ -1,39 +1,51 @@
 import { ApplyOptions } from '@sapphire/decorators';
 import { Command } from '@sapphire/framework';
 import { useQueue } from 'discord-player';
-import { Message } from 'discord.js';
+import type { Message } from 'discord.js';
 
 @ApplyOptions<Command.Options>({
-	description: 'Resumes the paused music'
+  description: 'Resume the paused track',
+  aliases: ['unpause'],
+  preconditions: ['MainOnly', 'CommandChannel'],
 })
 export class UserCommand extends Command {
-	public override async messageRun(message: Message) {
-		const { member, guild } = message;
+  public override async messageRun(message: Message): Promise<void> {
+    const result = this.doResume(message);
 
-		if (!guild) {
-			return message.reply('This command can only be used in a server.');
-		}
+    if (message.channel.isSendable()) {
+      await message.channel.send(result);
+    }
+  }
 
-		if (!message.channel.isSendable()) {
-			return;
-		}
+  private doResume(message: Message): string {
+    if (!message.guildId) {
+      return 'No guild ID provided';
+    }
 
-		const voiceChannel = member?.voice.channel;
-		if (!voiceChannel) {
-			return message.reply('You need to be in a voice channel to use this command.');
-		}
+    const memberVoiceChannelId = message.member?.voice.channelId;
+    if (!memberVoiceChannelId) {
+      return 'Join a voice channel first.';
+    }
 
-		const queue = useQueue(guild.id);
+    const botVoiceChannelId = message.guild?.members.me?.voice.channelId;
+    if (botVoiceChannelId && botVoiceChannelId !== memberVoiceChannelId) {
+      return 'I am in a different voice channel. Join the same channel first.';
+    }
 
-		if (!queue || !queue.isPlaying()) {
-			return message.reply('There is no music currently playing.');
-		}
+    const queue = useQueue(message.guildId);
+    const currentTrack = queue?.currentTrack;
+    if (!queue || !currentTrack) {
+      return 'No track is currently playing.';
+    }
 
-		if (!queue.node.isPaused()) {
-			return message.reply('The music is not paused.');
-		}
+    if (!queue.node.isPaused()) {
+      return 'The music is not paused.';
+    }
 
-		queue.node.setPaused(false);
-		return message.reply('Music has been resumed.');
-	}
+    if (queue.node.resume()) {
+      return `Resumed: **${currentTrack.title}**`;
+    }
+
+    return 'Failed to resume the track.';
+  }
 }
